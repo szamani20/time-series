@@ -1,0 +1,13 @@
+dataset/
+.idea/
+*.iml
+*.csv
+.ipynb_checkpoints/
+*.swp
+*.json
+*.users
+*.txt
+*.pdf
+__pycache__/
+temp.py
+

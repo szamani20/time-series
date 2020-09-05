@@ -26,16 +26,16 @@ import plotly.graph_objects as go
 
 ########################################################################################
 
-dataframe = pd.read_csv('dataset/concepts/sensor/light-anomaly/1.csv')
+dataframe = pd.read_csv('/home/szamani/PycharmProjects/anomaly-detection/dataset/concepts/sensor/light_anomaly/1.csv')
 # dataframe = dataframe.iloc[:5000, ]
 values = dataframe['light']
 timestamp = dataframe['time']
 
-derivatives = {'y_p': np.diff(values) / np.diff(timestamp),
-               'x_p': np.array((np.array(timestamp)[:-1] + np.array(timestamp)[1:]) / 2 + 0.5).astype(int)}
+# derivatives = {'y_p': np.diff(values) / np.diff(timestamp),
+#                'x_p': np.array((np.array(timestamp)[:-1] + np.array(timestamp)[1:]) / 2 + 0.5).astype(int)}
 
-fig = px.line(pd.DataFrame(data=derivatives), x='x_p', y='y_p')
-fig.show()
+# fig = px.line(pd.DataFrame(data=derivatives), x='x_p', y='y_p')
+# fig.show()
 
 fig = go.Figure()
 fig.add_trace(go.Line(x=dataframe['time'], y=dataframe['light']))

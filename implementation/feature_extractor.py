@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 from implementation.base_file_reader import FileReader
 from implementation.constants import *
@@ -9,73 +10,66 @@ class FeatureExtractor(FileReader):
         super().__init__()
 
     @staticmethod
-    def calculate_derivatives(dataframes):
+    def calculate_derivatives(values):
         derivatives = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            timestamp = df[TIME_COLUMN]
-            dv = {DERIVATIVE_Y: np.diff(values) / np.diff(timestamp),
+        for value in values:
+            timestamp = range(value.size)
+            dv = {DERIVATIVE_Y: np.diff(value) / np.diff(timestamp),
                   DERIVATIVE_X: np.array((np.array(timestamp)[:-1] + np.array(timestamp)[1:]) / 2 + 0.5).astype(int)}
-            derivatives.append(dv)
+            derivatives.append(np.insert(dv[DERIVATIVE_Y], 0, 0, axis=0))
         return derivatives
 
-    @staticmethod
-    def calculate_rolling_autocorrelation(dataframes, window_size=20):
-        auto_correlations = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).corr()
-            res[:window_size] = 0
-            auto_correlations.append(res)
+    # @staticmethod
+    # def calculate_autocorrelation(values, window_size=20):
+    #     auto_correlations = []
+    #     for value in values:
+    #         res = np.array(np.corrcoef(np.array([value[:-window_size], value[window_size:]])))
+    #         print(res.shape)
+    #         auto_correlations.append(res)
+    #
+    #     return auto_correlations
 
-        return auto_correlations
-
     @staticmethod
-    def calculate_rolling_mean(dataframes, window_size=20):
+    def calculate_rolling_mean(values, window_size=20):
         variances = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).mean()
+        for value in values:
+            res = value.rolling(window_size).mean()
             res[:window_size] = 0
             variances.append(res)
         return variances
 
     @staticmethod
-    def calculate_rolling_sum(dataframes, window_size=20):
+    def calculate_rolling_sum(values, window_size=20):
         variances = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).sum()
+        for value in values:
+            res = value.rolling(window_size).sum()
             res[:window_size] = 0
             variances.append(res)
         return variances
 
     @staticmethod
-    def calculate_rolling_variance(dataframes, window_size=20):
+    def calculate_rolling_variance(values, window_size=20):
         variances = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).var()
+        for value in values:
+            res = value.rolling(window_size).var()
             res[:window_size] = 0
             variances.append(res)
         return variances
 
     @staticmethod
-    def calculate_rolling_skewness(dataframes, window_size=20):
+    def calculate_rolling_skewness(values, window_size=20):
         skewness = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).skew()
+        for value in values:
+            res = value.rolling(window_size).skew()
             res[:window_size] = 0
             skewness.append(res)
         return skewness
 
     @staticmethod
-    def calculate_rolling_kurtosis(dataframes, window_size=20):
+    def calculate_rolling_kurtosis(values, window_size=20):
         kurtosis = []
-        for df in dataframes:
-            values = df[VALUE_COLUMN]
-            res = values.rolling(window_size).kurt()
+        for value in values:
+            res = value.rolling(window_size).kurt()
             res[:window_size] = 0
             kurtosis.append(res)
         return kurtosis

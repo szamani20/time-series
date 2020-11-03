@@ -13,7 +13,7 @@ class FileReader:
     @staticmethod
     def read_yahoo_data(file_number=1):
         dataframe = pd.read_csv(os.path.join(DATASET_PATH, YAHOO_SUBPATH, YAHOO_BASE_FILENAME.format(file_number)))
-        dataframe.rename({'timestamp': TIME_COLUMN}, inplace=True)
+        dataframe.rename(columns={'timestamp': TIME_COLUMN}, inplace=True)
         return dataframe
 
     @staticmethod
@@ -22,19 +22,19 @@ class FileReader:
         for fn in file_numbers:
             dataframes.append(
                 pd.read_csv(os.path.join(DATASET_PATH, YAHOO_SUBPATH, YAHOO_BASE_FILENAME.format(fn))).rename(
-                    {'timestamp': TIME_COLUMN}))
+                    columns={'timestamp': TIME_COLUMN}))
         return dataframes
 
     @staticmethod
     def read_power_data(supply=True):
         if supply:
             dataframe = pd.read_csv(os.path.join(DATASET_PATH, CONCEPTS_SUBPATH,
-                                                 POWER_PATH, POWER_SUPPLY)).rename({'hour': TIME_COLUMN,
-                                                                                    'supply': VALUE_COLUMN})
+                                                 POWER_PATH, POWER_SUPPLY)).rename(columns={'hour': TIME_COLUMN,
+                                                                                            'supply': VALUE_COLUMN})
         else:
             dataframe = pd.read_csv(os.path.join(DATASET_PATH, CONCEPTS_SUBPATH,
-                                                 POWER_PATH, POWER_TRANSFORM)).rename({'hour': TIME_COLUMN,
-                                                                                       'transform': VALUE_COLUMN})
+                                                 POWER_PATH, POWER_TRANSFORM)).rename(columns={'hour': TIME_COLUMN,
+                                                                                               'transform': VALUE_COLUMN})
 
         return dataframe
 
@@ -42,8 +42,5 @@ class FileReader:
     def read_light_data(file_number=1):
         dataframe = pd.read_csv(
             os.path.join(DATASET_PATH, CONCEPTS_SUBPATH, LIGHT_PATH, LIGHT_BASE_FILENAME.format(file_number)))
-        dataframe.rename({'light': VALUE_COLUMN}, inplace=True)
+        dataframe.rename(columns={'light': VALUE_COLUMN})
         return dataframe
-
-
-

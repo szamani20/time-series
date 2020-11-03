@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+
+from implementation.base_file_reader import FileReader
 from implementation.constants import *
 import plotly.express as px
 import plotly.graph_objects as go
@@ -29,3 +31,8 @@ class FileVisualizer:
             fig = go.Figure()
             fig.add_trace(go.Line(x=df[TIME_COLUMN], y=df[VALUE_COLUMN]))
             fig.show()
+
+# fr = FileReader()
+# dfs = fr.read_multiple_yahoo_data(range(60, 65))
+# fv = FileVisualizer()
+# fv.visualize_data_with_trace(dfs)

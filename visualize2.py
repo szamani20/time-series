@@ -26,7 +26,7 @@ import plotly.graph_objects as go
 
 ########################################################################################
 
-dataframe = pd.read_csv('/home/szamani/PycharmProjects/anomaly-detection/dataset/concepts/sensor/light_anomaly/1.csv')
+dataframe = pd.read_csv('/dataset/concepts/sensor/light_anomaly/1.csv')
 # dataframe = dataframe.iloc[:5000, ]
 values = dataframe['light']
 timestamp = dataframe['time']

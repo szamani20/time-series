@@ -12,4 +12,5 @@ VALUE_COLUMN = 'value'
 ANOMALY_COLUMN = 'is_anomaly'
 DERIVATIVE_X = 'x_p'
 DERIVATIVE_Y = 'y_p'
-
+YAHOO_SIZE = 67
+LIGHT_SIZE = 58

@@ -7,6 +7,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
+pd.set_option('display.max_colwidth', -1)
+
 
 class FileVisualizer:
     def __init__(self):
@@ -32,7 +37,3 @@ class FileVisualizer:
             fig.add_trace(go.Line(x=df[TIME_COLUMN], y=df[VALUE_COLUMN]))
             fig.show()
 
-# fr = FileReader()
-# dfs = fr.read_multiple_yahoo_data(range(60, 65))
-# fv = FileVisualizer()
-# fv.visualize_data_with_trace(dfs)

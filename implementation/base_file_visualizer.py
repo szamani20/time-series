@@ -18,12 +18,15 @@ class FileVisualizer:
         pass
 
     @staticmethod
-    def visualize_data_with_trace(dataframes, trace_name='is_anomaly'):
+    def visualize_data_with_trace(dataframes, title='', trace_name='is_anomaly'):
         for df in dataframes:
             anomalies = df[df[trace_name] == 1]
             anomalies = anomalies.index.tolist()
 
-            fig = go.Figure()
+            fig = go.Figure(layout=go.Layout(
+                title=go.layout.Title(text=title)
+            ))
+
             fig.add_trace(go.Line(x=df[TIME_COLUMN], y=df[VALUE_COLUMN]))
             fig.add_trace(go.Scatter(x=[i + 1 for i in anomalies], y=[df[VALUE_COLUMN][i] for i in anomalies],
                                      marker=dict(color='crimson', size=6),
@@ -31,9 +34,10 @@ class FileVisualizer:
             fig.show()
 
     @staticmethod
-    def visualize_data_without_trace(dataframes):
+    def visualize_data_without_trace(dataframes, title=''):
         for df in dataframes:
-            fig = go.Figure()
+            fig = go.Figure(layout=go.Layout(
+                title=go.layout.Title(text=title)
+            ))
             fig.add_trace(go.Line(x=df[TIME_COLUMN], y=df[VALUE_COLUMN]))
             fig.show()
-

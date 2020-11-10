@@ -75,8 +75,8 @@ class FileReader:
         for df in dataframes:
             is_anomaly = [0] * df.shape[0]
             max_value = df[VALUE_COLUMN].max()
-            anomaly_values = [round(max_value * 2), round(max_value * 2.5),
-                              round(max_value * 3), round(max_value * 3.5), round(max_value * 4)]
+            anomaly_values = [round(max_value * 0.8), round(max_value * 0.9),
+                              round(max_value * 1), round(max_value * 1.1), round(max_value * 1.2)]
             anomaly_counts = int(df.shape[0] * rate)
             for i in range(anomaly_counts):
                 anomaly_size = random.randint(1, max_anomaly_size)

@@ -126,27 +126,28 @@ ac = AnomalyClassification()
 
 ##################################
 
-yd = ac.read_multiple_yahoo_data(list(range(1, YAHOO_SIZE + 1)))
-ac.normalize_time_series(yd)
+# yd = ac.read_multiple_yahoo_data(list(range(1, YAHOO_SIZE + 1)))
+# ac.normalize_time_series(yd)
 # ac.visualize_data_with_trace(yd[59:60])
-single_merged_df = ac.merge_time_series(yd)
+# single_merged_df = ac.merge_time_series(yd)
 # ac.train_knn(yd, title='F1-Score, KNN, Yahoo')
-ac.visualize_data_with_trace([single_merged_df])
-ac.train_MLP([single_merged_df], title='F1-Score, FFNN, Yahoo Concat')
+# ac.train_knn([single_merged_df], title='F1-Score, KNN, Yahoo Concat')
+# ac.visualize_data_with_trace([single_merged_df])
+# ac.train_MLP([single_merged_df], title='F1-Score, FFNN, Yahoo Concat')
 
 ##################################
 
-# light_dataframes = []
-# for i in range(1, LIGHT_SIZE + 1):
-#     try:
-#         df = ac.read_light_data(i)
-#         light_dataframes.append(df)
-#     except Exception:
-#         pass
-# ac.visualize_data_without_trace(light_dataframes[:2])
-# ac.inject_anomaly(light_dataframes)
-# ac.visualize_data_with_trace(light_dataframes[2:5])
+light_dataframes = []
+for i in range(1, LIGHT_SIZE + 1):
+    try:
+        df = ac.read_light_data(i)
+        light_dataframes.append(df)
+    except Exception:
+        pass
+# ac.visualize_data_without_trace(light_dataframes[2:5])
+ac.inject_anomaly(light_dataframes)
+ac.visualize_data_with_trace(light_dataframes[7:10])
 # ac.train_knn(light_dataframes, title='F1-Score, KNN, Light')
-# ac.train_MLP(light_dataframes, title='F1-Score, FFNN, Light')
+ac.train_MLP(light_dataframes, title='F1-Score, FFNN, Light')
 
 ##################################

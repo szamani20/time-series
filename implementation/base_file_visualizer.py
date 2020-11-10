@@ -28,7 +28,7 @@ class FileVisualizer:
             ))
 
             fig.add_trace(go.Line(x=df[TIME_COLUMN], y=df[VALUE_COLUMN]))
-            fig.add_trace(go.Scatter(x=[i + 1 for i in anomalies], y=[df[VALUE_COLUMN][i] for i in anomalies],
+            fig.add_trace(go.Scatter(x=[i for i in anomalies], y=[df[VALUE_COLUMN][i] for i in anomalies],
                                      marker=dict(color='crimson', size=6),
                                      mode='markers'))
             fig.show()

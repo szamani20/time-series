@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 import random
+from sklearn.preprocessing import MinMaxScaler
 
 
 class FileReader:
@@ -47,6 +48,27 @@ class FileReader:
             columns={'timestamp': TIME_COLUMN,
                      'light': VALUE_COLUMN})
         return dataframe
+
+    @staticmethod
+    def normalize_values(values, normalization_range=(0, 100)):
+        scaler = MinMaxScaler(feature_range=normalization_range)
+        scaler.fit(values)
+        normalized = scaler.transform(values)
+        return normalized
+
+    @staticmethod
+    def normalize_time_series(datasets):
+        for df in datasets:
+            normalized_values = FileReader.normalize_values(values=df[VALUE_COLUMN].values.reshape(-1, 1))
+            df[VALUE_COLUMN] = normalized_values
+        return datasets
+
+    @staticmethod
+    def merge_time_series(datasets):
+        df = pd.concat(datasets)
+        df[TIME_COLUMN] = np.arange(df.shape[0])
+        df.reset_index(drop=True, inplace=True)
+        return df
 
     @staticmethod
     def inject_anomaly(dataframes, rate=.05, max_anomaly_size=3):

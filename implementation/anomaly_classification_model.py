@@ -6,6 +6,8 @@ import numpy as np
 from tqdm import tqdm
 import sys
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
@@ -40,32 +42,33 @@ class AnomalyClassification(FileReader, FileVisualizer):
         }
         return features
 
-    def train_knn(self, datasets, title='', k=10):
-        # yahoo_data = self.read_multiple_yahoo_data(list(range(1, YAHOO_SIZE + 1)))
+    def train_model(self, model, datasets, title='', k=10, history=True):
         features = self.extract_features()
 
         f1_scores = []
         i = 0
-        for yd in datasets:
+        for ds in datasets:
             i += 1
-            values = yd[VALUE_COLUMN]
+            values = ds[VALUE_COLUMN]
             for f in features.items():
-                res = f[1](values)
+                res, past_res = f[1](values)
+
+                # past_res is the shifted version of res. So no need to check
                 if np.isnan(res).any():
                     # print('Feature {} has nan'.format(f))
                     continue
-                yd[f[0]] = res
+                ds[f[0]] = res
+                if history and past_res is not None:
+                    ds[f[0] + '_past'] = past_res
 
-            # yd = yd.iloc[20:]
-
-            X = yd.drop(columns=[ANOMALY_COLUMN, TIME_COLUMN])
+            X = ds.drop(columns=[ANOMALY_COLUMN, TIME_COLUMN])
 
             if X.isnull().values.any():
                 print('NaN', i)
                 f1_scores.append(0)
                 continue
 
-            y = yd[ANOMALY_COLUMN].values
+            y = ds[ANOMALY_COLUMN].values
             X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
             scaler = StandardScaler()
@@ -73,49 +76,8 @@ class AnomalyClassification(FileReader, FileVisualizer):
             X_train = scaler.transform(X_train)
             X_test = scaler.transform(X_test)
 
-            knn = KNeighborsClassifier(n_neighbors=k)
-            knn.fit(X_train, y_train)
-            y_pred = knn.predict(X_test)
-            f1_scores.append(f1_score(y_test, y_pred))
-
-        self.visualize_data_without_trace([pd.DataFrame(data=enumerate(f1_scores),
-                                                        columns=[TIME_COLUMN, VALUE_COLUMN])], title=title)
-
-    def train_MLP(self, datasets, title=''):
-        features = self.extract_features()
-
-        f1_scores = []
-        i = 0
-        for yd in tqdm(datasets):
-            i += 1
-            values = yd[VALUE_COLUMN]
-            for f in features.items():
-                res = f[1](values)
-                if np.isnan(res).any():
-                    # print('Feature {} has nan'.format(f))
-                    continue
-                yd[f[0]] = res
-
-            # yd = yd.iloc[20:]
-
-            X = yd.drop(columns=[ANOMALY_COLUMN, TIME_COLUMN])
-
-            if X.isnull().values.any():
-                print('NaN', i)
-                f1_scores.append(0)
-                continue
-
-            y = yd[ANOMALY_COLUMN].values
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
-
-            scaler = StandardScaler()
-            scaler.fit(X_train)
-            X_train = scaler.transform(X_train)
-            X_test = scaler.transform(X_test)
-
-            mlp = MLPClassifier()
-            mlp.fit(X_train, y_train)
-            y_pred = mlp.predict(X_test)
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
             f1_scores.append(f1_score(y_test, y_pred))
 
         self.visualize_data_without_trace([pd.DataFrame(data=enumerate(f1_scores),
@@ -128,17 +90,23 @@ ac = AnomalyClassification()
 
 # yd = ac.read_multiple_yahoo_data(list(range(1, YAHOO_SIZE + 1)))
 # ac.normalize_time_series(yd)
-# ac.visualize_data_with_trace(yd[59:60])
+# # ac.visualize_data_with_trace(yd[59:60])
 # single_merged_df = ac.merge_time_series(yd)
-# ac.train_knn(yd, title='F1-Score, KNN, Yahoo')
-# ac.train_knn([single_merged_df], title='F1-Score, KNN, Yahoo Concat')
-# ac.visualize_data_with_trace([single_merged_df])
-# ac.train_MLP([single_merged_df], title='F1-Score, FFNN, Yahoo Concat')
+# # ac.train_model(KNeighborsClassifier(n_neighbors=10), yd, title='F1-Score, KNN, Yahoo')
+# # ac.visualize_data_with_trace([single_merged_df])
+# ac.train_model(KNeighborsClassifier(n_neighbors=10),
+#                [single_merged_df],
+#                title='F1-Score, KNN, Yahoo Normalized and merged, considering 200 history',
+#                history=True)
+# ac.train_model(MLPClassifier(),
+#                [single_merged_df],
+#                title='F1-Score, FFNN, Yahoo Normalized and merged, considering 200 history',
+#                history=True)
 
 ##################################
 
 light_dataframes = []
-for i in range(1, LIGHT_SIZE + 1):
+for i in range(1, LIGHT_SIZE - 45):
     try:
         df = ac.read_light_data(i)
         light_dataframes.append(df)
@@ -146,8 +114,39 @@ for i in range(1, LIGHT_SIZE + 1):
         pass
 # ac.visualize_data_without_trace(light_dataframes[2:5])
 ac.inject_anomaly(light_dataframes)
-ac.visualize_data_with_trace(light_dataframes[7:10])
-# ac.train_knn(light_dataframes, title='F1-Score, KNN, Light')
-ac.train_MLP(light_dataframes, title='F1-Score, FFNN, Light')
+ac.visualize_data_with_trace(light_dataframes[2:3])
+ac.train_model(KNeighborsClassifier(n_neighbors=10),
+               light_dataframes,
+               title='F1-Score, KNN-10, Light, not considering history',
+               history=False)
+ac.train_model(MLPClassifier(),
+               light_dataframes,
+               title='F1-Score, FFNN, Light, not considering history',
+               history=False)
+ac.train_model(SVC(),
+               light_dataframes,
+               title='F1-Score, SVM, Light, not considering history',
+               history=False)
+ac.train_model(RandomForestClassifier(),
+               light_dataframes,
+               title='F1-Score, RF, Light, not considering history',
+               history=False)
+
+ac.train_model(KNeighborsClassifier(n_neighbors=10),
+               light_dataframes,
+               title='F1-Score, KNN-10, Light, considering 50 history',
+               history=True)
+ac.train_model(MLPClassifier(),
+               light_dataframes,
+               title='F1-Score, FFNN, Light, considering 50 history',
+               history=True)
+ac.train_model(SVC(),
+               light_dataframes,
+               title='F1-Score, SVM, Light, considering 50 history',
+               history=True)
+ac.train_model(RandomForestClassifier(),
+               light_dataframes,
+               title='F1-Score, RF, Light, considering 50 history',
+               history=True)
 
 ##################################

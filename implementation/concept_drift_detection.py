@@ -25,8 +25,8 @@ df = fr.read_light_data(df_num)
 # print(df.head(100))
 
 mean_diff = np.mean(df['value'])
-std = np.std(df['value']) / 3
-drift_std = np.std(df['value']) / 5
+std = np.std(df['value']) / 2
+drift_std = np.std(df['value']) / 3
 ccv = stats.variation(df['value'], nan_policy='omit')
 print(std, ccv)
 
@@ -37,8 +37,9 @@ abrupt_value_threshold = 15
 class CDDetection:
     def __init__(self):
         self.base_window_size = 100
-        self.drift_window_size = 20
-        self.min_stable_concept_length = 50
+        self.drift_window_size = 150
+        self.min_stable_concept_length = 200
+        self.max_len = max(self.base_window_size, self.drift_window_size, self.min_stable_concept_length)
 
     def identify_stable_concepts(self, df):
         current_concept_start = 100
@@ -46,12 +47,12 @@ class CDDetection:
         previous_concept_end = 99
         stable_concept = True
         concept_start_end = [[0, 99], [100, -1]]
-        while i < df.shape[0] - 2 * self.base_window_size:
+        while i < df.shape[0] - 2 * self.max_len:
             if stable_concept:
                 i = current_concept_start + self.min_stable_concept_length
                 ew = df.iloc[current_concept_start - self.base_window_size:i, 1].expanding().mean().tolist()
                 stable_concept_value = ew[self.base_window_size + self.min_stable_concept_length - 1]
-            while stable_concept and i < df.shape[0] - 2 * self.base_window_size:
+            while stable_concept and i < df.shape[0] - 2 * self.max_len:
                 mean_so_far = (ew[-1] * len(ew) + df.iloc[i, 1]) / (len(ew) + 1)
                 ew.append(mean_so_far)
                 if abs(mean_so_far - stable_concept_value) > std:
@@ -65,7 +66,7 @@ class CDDetection:
                     for k in range(1, len(ew)):
                         ew[k] = ((k + 1) * ew[k] - ew[0]) / k
 
-            if i >= df.shape[0] - 4 * self.base_window_size:
+            if i >= df.shape[0] - 4 * self.max_len:
                 print('HERE', i)
                 break
 
@@ -74,7 +75,7 @@ class CDDetection:
                      previous_concept_end - self.drift_window_size:i + self.min_stable_concept_length + 1,
                      1].expanding().mean().tolist()
                 j = self.drift_window_size + 1
-            while not stable_concept and i < df.shape[0] - 2 * self.drift_window_size:
+            while not stable_concept and i < df.shape[0] - 2 * self.max_len:
                 mean_so_far = ew[j]
                 min_mean = min(ew[j + 1:])
                 max_mean = max(ew[j + 1:])

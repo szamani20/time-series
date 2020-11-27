@@ -18,9 +18,11 @@ pd.set_option('display.max_colwidth', -1)
 
 class CDDetection:
     def __init__(self):
-        self.base_window_size = 100
-        self.drift_window_size = 150
-        self.min_stable_concept_length = 200
+        self.base_window_size = 20
+        self.sliding_window_coe = 10
+        self.drift_window_size = 10
+        self.min_stable_concept_length = 400
+        self.maximum_drift_variation = 0.3
         self.max_len = max(self.base_window_size, self.drift_window_size, self.min_stable_concept_length)
         self.abrupt_time_threshold = 20
         self.abrupt_value_threshold = 15
@@ -34,24 +36,25 @@ class CDDetection:
         # fv.visualize_data_without_trace([df])
         # print(df.head(100))
 
-        mean_diff = np.mean(df['value'])
+        mean = np.mean(df['value'])
         std = np.std(df['value']) / 2
         drift_std = np.std(df['value']) / 3
         ccv = stats.variation(df['value'], nan_policy='omit')
+        print(mean, std, drift_std, ccv)
 
         return df, std, drift_std
 
     def identify_stable_concepts(self, df, epsilon, drift_epsilon):
-        current_concept_start = 100
+        current_concept_start = self.base_window_size
         i = current_concept_start + self.min_stable_concept_length
-        previous_concept_end = 99
+        previous_concept_end = current_concept_start - 1
         stable_concept = True
-        concept_start_end = [[0, 99], [100, -1]]
+        concept_start_end = [[0, previous_concept_end], [current_concept_start, -1]]
         while i < df.shape[0] - 2 * self.max_len:
             if stable_concept:
                 i = current_concept_start + self.min_stable_concept_length
                 ew = df.iloc[current_concept_start - self.base_window_size:i, 1].expanding().mean().tolist()
-                stable_concept_value = ew[self.base_window_size + self.min_stable_concept_length - 1]
+                stable_concept_value = ew[2 * self.base_window_size]
             while stable_concept and i < df.shape[0] - 2 * self.max_len:
                 mean_so_far = (ew[-1] * len(ew) + df.iloc[i, 1]) / (len(ew) + 1)
                 ew.append(mean_so_far)
@@ -62,9 +65,10 @@ class CDDetection:
                     concept_start_end[-1][1] = previous_concept_end
                     concept_start_end.append([-1, -1])
                 i += 1
-                if len(ew) >= 2 * self.base_window_size:
+                if len(ew) >= self.sliding_window_coe * self.base_window_size:
                     for k in range(1, len(ew)):
                         ew[k] = ((k + 1) * ew[k] - ew[0]) / k
+                    ew.pop(0)
 
             if i >= df.shape[0] - 4 * self.max_len:
                 print('HERE', i)
@@ -81,7 +85,10 @@ class CDDetection:
                 max_mean = max(ew[j + 1:])
                 mean_to_append = (ew[-1] * len(ew) + df.iloc[i + self.min_stable_concept_length + 1, 1]) / (len(ew) + 1)
                 ew.append(mean_to_append)
-                if abs(mean_so_far - min_mean) < drift_epsilon and abs(mean_so_far - max_mean) < drift_epsilon:
+                variation = stats.variation(df.iloc[i: i + self.min_stable_concept_length, 1], nan_policy='omit')
+                if abs(mean_so_far - min_mean) < drift_epsilon and \
+                        abs(mean_so_far - max_mean) < drift_epsilon \
+                        and variation < self.maximum_drift_variation:
                     previous_concept_end = -1
                     current_concept_start = i
                     stable_concept = True
@@ -105,10 +112,12 @@ class CDDetection:
         concepts_end = np.array(concept_start_end)[:, 1].flatten()
         fig.add_trace(go.Line(x=df['time'], y=df['value']))
         fig.add_trace(go.Scatter(x=[i for i in concepts_start], y=[df['value'][i] for i in concepts_start],
-                                 marker=dict(color='crimson', size=10),
+                                 marker=dict(color='green', size=10),
+                                 name='Start',
                                  mode='markers'))
         fig.add_trace(go.Scatter(x=[i for i in concepts_end], y=[df['value'][i] for i in concepts_end],
-                                 marker=dict(color='green', size=10),
+                                 marker=dict(color='red', size=10),
+                                 name='End',
                                  mode='markers'))
         fig.show()
 
@@ -120,4 +129,3 @@ cdd = CDDetection()
 df, std, drift_std = cdd.read_df(2)
 concept_start_end = cdd.identify_stable_concepts(df, std, drift_std)
 cdd.visualize_concepts(df, concept_start_end)
-

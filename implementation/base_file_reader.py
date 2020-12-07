@@ -70,6 +70,9 @@ class FileReader:
         df.reset_index(drop=True, inplace=True)
         return df
 
+    def inject_single_anomaly(self, df, rate=0.01, max_anomaly_size=3):
+        return self.inject_anomaly([df], rate=rate, max_anomaly_size=max_anomaly_size)[0]
+
     @staticmethod
     def inject_anomaly(dataframes, rate=.01, max_anomaly_size=3):
         window_size = int(1 / rate)

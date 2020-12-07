@@ -45,6 +45,10 @@ class CDDetection:
 
         return df, std, drift_std
 
+    @staticmethod
+    def calculate_df_stats(df):
+        return np.std(df['value']) / 2, np.std(df['value']) / 3
+
     def identify_stable_concepts(self, df, epsilon, drift_epsilon):
         current_concept_start = self.base_window_size
         i = current_concept_start + self.min_stable_concept_length
@@ -100,8 +104,8 @@ class CDDetection:
         if concept_start_end[-1][0] == -1 or concept_start_end[-1][1] == -1:
             concept_start_end.pop()
 
-        print(len(concept_start_end))
-        pprint(concept_start_end)
+        # print(len(concept_start_end))
+        # pprint(concept_start_end)
 
         return concept_start_end
 
@@ -135,9 +139,10 @@ class CDDetection:
         pass
 
 
-cdd = CDDetection()
-df, std, drift_std = cdd.read_df(2)
-concept_start_end = cdd.identify_stable_concepts(df, std, drift_std)
-cdd.add_drift_column(df, concept_start_end)
-# print(df.head(5000))
-cdd.visualize_concepts(df, concept_start_end)
+if __name__ == '__main__':
+    cdd = CDDetection()
+    df, std, drift_std = cdd.read_df(2)
+    concept_start_end = cdd.identify_stable_concepts(df, std, drift_std)
+    cdd.add_drift_column(df, concept_start_end)
+    # print(df.head(5000))
+    cdd.visualize_concepts(df, concept_start_end)

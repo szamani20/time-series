@@ -5,6 +5,7 @@ from implementation.base_file_visualizer import FileVisualizer
 import pandas as pd
 import numpy as np
 from scipy import stats
+from implementation.constants import *
 import plotly.express as px
 import plotly.graph_objects as go
 from tqdm import tqdm
@@ -121,6 +122,15 @@ class CDDetection:
                                  mode='markers'))
         fig.show()
 
+    @staticmethod
+    # CSE = concept_start_end
+    def add_drift_column(df, cse):
+        concept_column = [1] * df.shape[0]
+        for se in cse:
+            concept_column[se[0]: se[1]] = [0] * (se[1] - se[0])
+        df[DRIFT_COLUMN] = concept_column
+        return df
+
     def identify_drifts(self):
         pass
 
@@ -128,4 +138,6 @@ class CDDetection:
 cdd = CDDetection()
 df, std, drift_std = cdd.read_df(2)
 concept_start_end = cdd.identify_stable_concepts(df, std, drift_std)
+cdd.add_drift_column(df, concept_start_end)
+# print(df.head(5000))
 cdd.visualize_concepts(df, concept_start_end)

@@ -10,6 +10,7 @@ LIGHT_BASE_FILENAME = '{}.csv'
 TIME_COLUMN = 'time'
 VALUE_COLUMN = 'value'
 ANOMALY_COLUMN = 'is_anomaly'
+DRIFT_COLUMN = 'is_drift'
 DERIVATIVE_X = 'x_p'
 DERIVATIVE_Y = 'y_p'
 YAHOO_SIZE = 67

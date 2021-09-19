@@ -137,9 +137,9 @@ class ErrorDetection:
     def evaluate_scores(self):
         for cp in self.candidate_scores:
             scores = self.candidate_scores[cp]
-            # # Abnormal point
-            # if scores[0] < self.k and scores[1] < self.c and scores[2] > self.v:
-            #     pass
+            # Abnormal point
+            if scores[0] < self.k and scores[1] < self.c and scores[2] > self.v:
+                print(scores)
 
     def perform_clustering(self, title='Yahoo'):
         train_data = []
@@ -177,7 +177,7 @@ class ErrorDetection:
         clustering_index = {
             0: set(),
             1: set(),
-            # 2: set()
+            2: set()
         }
         for point_index, scores in self.candidate_scores.items():
             clustering_index[scores[3]].add(point_index)
@@ -192,8 +192,8 @@ class ErrorDetection:
                 max_precision = precision
                 max_recall = recall
 
-        # print('Precision: ', max_precision)
-        # print('Recall: ', max_recall)
+        print('Precision: ', max_precision)
+        print('Recall: ', max_recall)
         # return max_precision, max_recall
         # print(max_precision, max_recall)
         if max_precision != 0 and max_recall != 0:
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     # ])
 
     time_series = pd.read_csv(
-        '/home/szamani/PycharmProjects/anomaly-detection/dataset/concepts/sensor/light_anomaly_skewed/2.csv',
+        './dataset/concepts/sensor/light_anomaly_skewed/2.csv',
         converters={
             'time': int,
             'light': float
@@ -243,7 +243,7 @@ if __name__ == '__main__':
     # for i in range(1, 56):
     #     try:
     #         time_series = pd.read_csv(
-    #             '/home/szamani/PycharmProjects/anomaly-detection/dataset/A1Benchmark/{}.csv'.format(i),
+    #             '/home/szamani/PycharmProjects/anomaly_detection/dataset/Yahoo/{}.csv'.format(i),
     #             converters={
     #                 'time': int,
     #                 'light': float
@@ -261,9 +261,7 @@ if __name__ == '__main__':
     #     # ed.compute_inn(time_series, 515)
     #     # print(ed.standardize_time_series())
     #
-    #     # TODO: assumed that absolute value of second difference is defined inaccurate
     #     # in the paper
-    #     # TODO: There's no explanation on how this MAD value is used to choose candidates
     #     anomaly_score = ed.compute_anomaly_score(time_series[:, 1])
     #     mad = ed.compute_median_absolute_deviation(anomaly_score)
     #     candidate_points = [i for i in range(2, len(time_series)) if ed.compute_median_absolute_deviation(
@@ -271,7 +269,6 @@ if __name__ == '__main__':
     #
     #     ed.compute_scores(candidate_points)
     #
-    #     # TODO: what to do next? Gaussian Mixture Clustering?
     #     # ed.evaluate_scores()
     #
     #     ed.perform_clustering()

@@ -1,5 +1,5 @@
-DATASET_PATH = '/home/szamani/PycharmProjects/anomaly-detection/dataset/'
-YAHOO_SUBPATH = 'A1Benchmark/'
+DATASET_PATH = '/home/szamani/PycharmProjects/anomaly_detection/dataset/'
+YAHOO_SUBPATH = 'Yahoo/'
 YAHOO_BASE_FILENAME = 'real_{}.csv'
 CONCEPTS_SUBPATH = 'concepts/'
 POWER_PATH = 'powers/'
@@ -17,3 +17,9 @@ YAHOO_SIZE = 67
 LIGHT_SIZE = 58
 WINDOW_EXCEPTION_RATE = 0.2
 HISTORY_WINDOW = 50
+# Set in run time according to the dataset stats
+delta = -1
+Delta = -1
+phi = -1
+mu = -1
+nu = -1

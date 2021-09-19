@@ -9,11 +9,11 @@ class Visualization:
     def __init__(self):
         pass
 
-    def read_yahoo_data(self, base_path='dataset/A1Benchmark/', base_filename='real_{}.csv', file_number=1):
+    def read_yahoo_data(self, base_path='dataset/Yahoo/', base_filename='real_{}.csv', file_number=1):
         dataframe = pd.read_csv(os.path.join(base_path, base_filename.format(file_number)))
         return dataframe
 
-    def read_multiple_yahoo_data(self, filenumbers, base_path='dataset/A1Benchmark/', base_filename='real_{}.csv'):
+    def read_multiple_yahoo_data(self, filenumbers, base_path='dataset/Yahoo/', base_filename='real_{}.csv'):
         dataframes = []
         for fn in filenumbers:
             dataframes.append(pd.read_csv(os.path.join(base_path, base_filename.format(fn))))

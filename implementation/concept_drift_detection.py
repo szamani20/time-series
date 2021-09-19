@@ -19,10 +19,12 @@ pd.set_option('display.max_colwidth', -1)
 
 class CDDetection:
     def __init__(self):
-        self.base_window_size = 20
-        self.sliding_window_coe = 10
+        # Change according to dataset
+        # Default values for my experiment
+        self.base_window_size = 10
+        self.sliding_window_coe = 5
         self.drift_window_size = 10
-        self.min_stable_concept_length = 400
+        self.min_stable_concept_length = 50
         self.maximum_drift_variation = 0.3
         self.max_len = max(self.base_window_size, self.drift_window_size, self.min_stable_concept_length)
         self.abrupt_time_threshold = 20
@@ -34,8 +36,8 @@ class CDDetection:
 
         df = fr.read_light_data(num)
 
-        # fv.visualize_data_without_trace([df])
-        # print(df.head(100))
+        fv.visualize_data_without_trace([df])
+        print(df.head(100))
 
         mean = np.mean(df['value'])
         std = np.std(df['value']) / 2
@@ -49,6 +51,7 @@ class CDDetection:
     def calculate_df_stats(df):
         return np.std(df['value']) / 2, np.std(df['value']) / 3
 
+    # Main CD detection Algorithm
     def identify_stable_concepts(self, df, epsilon, drift_epsilon):
         current_concept_start = self.base_window_size
         i = current_concept_start + self.min_stable_concept_length
@@ -134,9 +137,6 @@ class CDDetection:
             concept_column[se[0]: se[1]] = [0] * (se[1] - se[0])
         df[DRIFT_COLUMN] = concept_column
         return df
-
-    def identify_drifts(self):
-        pass
 
 
 if __name__ == '__main__':

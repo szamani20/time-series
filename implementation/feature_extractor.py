@@ -16,15 +16,15 @@ class FeatureExtractor(FileReader):
               DERIVATIVE_X: np.array((np.array(timestamp)[:-1] + np.array(timestamp)[1:]) / 2 + 0.5).astype(int)}
         return np.insert(dv[DERIVATIVE_Y], 0, 0, axis=0), None
 
-    # @staticmethod
-    # def calculate_autocorrelation(values, window_size=20):
-    #     auto_correlations = []
-    #     for value in values:
-    #         res = np.array(np.corrcoef(np.array([value[:-window_size], value[window_size:]])))
-    #         print(res.shape)
-    #         auto_correlations.append(res)
-    #
-    #     return auto_correlations
+    @staticmethod
+    def calculate_autocorrelation(values, window_size=20):
+        auto_correlations = []
+        for value in values:
+            res = np.array(np.corrcoef(np.array([value[:-window_size], value[window_size:]])))
+            print(res.shape)
+            auto_correlations.append(res)
+
+        return auto_correlations
 
     @staticmethod
     def calculate_rolling_mean(values, window_size=20, long_past_margin=HISTORY_WINDOW):

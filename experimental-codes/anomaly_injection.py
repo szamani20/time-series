@@ -58,7 +58,7 @@ pd.set_option('display.max_colwidth', -1)
 
 ##############################################################################################
 
-base_path = 'dataset/concepts/sensor/light'
+base_path = '../dataset/concepts/sensor/light'
 # base_anomaly_path = 'dataset/concepts/sensor/light_anomaly'
 # base_anomaly_dense_path = 'dataset/concepts/sensor/light_anomaly_dense'
 base_anomaly_skewed_path = 'dataset/concepts/sensor/light_anomaly_skewed'

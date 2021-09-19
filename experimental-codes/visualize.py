@@ -20,7 +20,7 @@ class Visualization:
         return dataframes
 
 
-dataframe = pd.read_csv('dataset/concepts/sensor/light/1.csv')
+dataframe = pd.read_csv('../dataset/concepts/sensor/light/1.csv')
 
 values = dataframe['value']
 anomalies = dataframe[dataframe['is_anomaly'] == 1]

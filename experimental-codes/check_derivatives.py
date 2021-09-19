@@ -3,7 +3,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-dataframe = pd.read_csv('dataset/Yahoo/real_42.csv')
+dataframe = pd.read_csv('../dataset/Yahoo/real_42.csv')
 
 values = dataframe['value']
 anomalies = dataframe[dataframe['is_anomaly'] == 1]

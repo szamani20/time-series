@@ -12,7 +12,7 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', -1)
 
-df = pd.read_csv('dataset/concepts/synthetic/inc.txt',
+df = pd.read_csv('../dataset/concepts/synthetic/inc.txt',
                  usecols=[4],
                  header=None,
                  # nrows=50,
